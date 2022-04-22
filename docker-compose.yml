@@ -1,0 +1,33 @@
+version: '3'
+services:
+  nginx:
+    image: nginx:1.20.1-alpine
+    depends_on:
+      - php-fpm
+    volumes:
+      - ./www:/var/www
+      - ./config/nginx:/etc/nginx/conf.d
+      - ./logs/nginx:/var/log/nginx
+    ports:
+      - "80:80"
+    links:
+      - php-fpm
+    networks:
+      - network
+    restart: on-failure
+  
+  php-fpm:
+    build:
+      context: ./config/php
+      dockerfile: Dockerfile
+    volumes:
+      - ./www:/var/www
+      - ./config/php/php.ini:/usr/local/etc/php/php.ini
+    ports:
+      - "9000:9000"
+    restart: on-failure
+    networks:
+      - network
+
+networks:
+  network:
